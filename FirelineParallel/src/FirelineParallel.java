@@ -1,3 +1,5 @@
+import java.util.concurrent.ForkJoinPool;
+
 /**
  * Serial prototype for the Fireline parallel-programming assignment.
  *
@@ -7,17 +9,18 @@
  * double buffering.
  *
  * Usage:
- *   java FirelineSerial <rows> <columns> <seed> <mode> <output-prefix>
+ *   java FirelineParallel <rows> <columns> <seed> <mode> <output-prefix>
  *                       [max-steps] [tolerance] [landscape]
  *                       [ignition-top-row ignition-left-column patch-size]
  *
  * Example:
- *   java FirelineSerial 300 300 42 wildfire output/fireline
+ *   java FirelineParallel 300 300 42 wildfire output/fireline
  */
-public class FirelineSerial {
+public class FirelineParallel {
 
     private static final int DEFAULT_MAXIMUM_STEPS = 5_000;
     private static final double DEFAULT_TOLERANCE = 0.05;
+    
 
     public static void main(String[] args) {
         //checks that correct number of arguments input
@@ -61,6 +64,8 @@ public class FirelineSerial {
             }
 
             //creates a firemap object
+
+
             FireMap map = new FireMap(
                     rows, columns, seed, mode, landscape,
                     ignitionTopRow, ignitionLeftColumn, ignitionPatchSize);
@@ -166,16 +171,16 @@ public class FirelineSerial {
 
     private static void printUsage() {
         System.err.println(
-                "Usage: java FirelineSerial <rows> <columns> <seed> "
+                "Usage: java FirelineParallel <rows> <columns> <seed> "
                 + "<diffusion|wildfire> <output-prefix> "
                 + "[max-steps] [tolerance] [mixed|grass] "
                 + "[ignition-top-row ignition-left-column patch-size]");
         System.err.println("Examples:");
         System.err.println(
-                "  java FirelineSerial 300 300 42 wildfire "
+                "  java FirelineParallel 300 300 42 wildfire "
                 + "output/fireline");
         System.err.println(
-                "  java FirelineSerial 2000 2000 17 wildfire "
+                "  java FirelineParallel 2000 2000 17 wildfire "
                 + "output/benchmark 50000 0.05 grass 20 20 9");
     }
 
