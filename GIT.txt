@@ -1,0 +1,18 @@
+commit 363d6ba9b4194575bd68da11178f9c201821d753
+Author: noah <115147506+moonfrog21@users.noreply.github.com>
+Date:   Wed Aug 19 18:50:34 2026 +0200
+
+    updated file names for automarker
+
+commit 79157baba4bc0f90822e634d3b53a76723eba7df
+Author: noah <115147506+moonfrog21@users.noreply.github.com>
+Date:   Tue Aug 18 21:28:03 2026 +0200
+
+    succesfully implemented FirelineParallel, untested
+    with automarker
+
+commit 9d527aab50abb2c365e52c6ec8b17ab35ae027a7
+Author: noah <115147506+moonfrog21@users.noreply.github.com>
+Date:   Tue Aug 11 07:49:36 2026 +0200
+
+    initial commit

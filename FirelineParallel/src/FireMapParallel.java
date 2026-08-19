@@ -20,7 +20,7 @@ import javax.imageio.ImageIO;
  */
 public class FireMapParallel {
 
-    private static int minimumParallelArea = 10000;
+    private ForkJoinPool pool;
 
     public enum Mode {
         DIFFUSION,
@@ -143,8 +143,6 @@ public class FireMapParallel {
     private final double[][] peakTemperature;
     private String sourceDescription;
 
-    ForkJoinPool pool;
-
     //constructor 1
     public FireMapParallel(int rows, int columns, long seed, Mode mode) {
         this(rows, columns, seed, mode, Landscape.MIXED,
@@ -179,7 +177,6 @@ public class FireMapParallel {
         this.nextBurning = new boolean[rows][columns];
         this.peakTemperature = new double[rows][columns];
 
-        pool = ForkJoinPool.commonPool();
 
         if (landscape == Landscape.GRASS) {
             generateGrassLandscape();
@@ -189,6 +186,8 @@ public class FireMapParallel {
         initialiseDynamicState();
         configureSources(mode, landscape, ignitionTopRow,
                 ignitionLeftColumn, ignitionPatchSize);
+
+        pool = ForkJoinPool.commonPool();
     }
 
     /**
@@ -196,63 +195,14 @@ public class FireMapParallel {
      */
 
     //this needs to be implemented in parallel
-    private static class parallelUpdate extends RecursiveTask<StepResult> {
-        private final FireMapParallel map;
-        private final Mode mode;
-        private final int rowStart;
-        private final int rowEnd;
-        private final int columnStart;
-        private final int columnEnd;
-
-        parallelUpdate(FireMapParallel map, Mode mode, int rowStart, int rowEnd, int columnStart, int columnEnd) {
-            this.map = map;
-            this.mode = mode;
-            this.rowStart = rowStart;
-            this.rowEnd = rowEnd;
-            this.columnStart = columnStart;
-            this.columnEnd = columnEnd;
-        }
-
-        @Override
-        protected StepResult compute() {
-            //base condition certain size area
-            //-> return updateRegion of that region
-            if((rowEnd-rowStart) * (columnEnd - columnStart) <= minimumParallelArea) {
-                StepResult result = map.updateRegion(mode, rowStart, rowEnd, columnStart, columnEnd);
-                return result;
-            }
-            else {
-                //if wider map, split along a column
-                parallelUpdate left;
-                parallelUpdate right;
-                if((columnEnd - columnStart) > (rowEnd-rowStart)) {
-                    int columMidpoint = (columnEnd + columnStart)/2;
-                    left = new parallelUpdate(map, mode, rowStart, rowEnd, columnStart, columMidpoint);
-                    right = new parallelUpdate(map, mode, rowStart, rowEnd, columMidpoint, columnEnd);
-
-                }
-                else{
-                    int rowMidpoint = (rowEnd + rowStart)/2;
-                    left = new parallelUpdate(map, mode, rowStart, rowMidpoint, columnStart, columnEnd);
-                    right = new parallelUpdate(map, mode, rowMidpoint, rowEnd, columnStart, columnEnd);
-                }
-                
-                left.fork();
-                StepResult rightResult = right.compute();
-                StepResult leftResult = left.join();
-                return FireMapParallel.StepResult.combine(leftResult,rightResult);
-            }
-  
-        }
-    }
-
 
     //returns type StepResult
     public final StepResult step(Mode mode) {
         //sets next Borders: updates the cells around the edges
         prepareNextState();
         //get step result
-        StepResult result = pool.invoke(new parallelUpdate(this, mode, 1, rows - 1, 1, columns - 1));
+        FireTask runParallel = new FireTask(this, mode, 1, rows - 1, 1, columns - 1);
+        StepResult result = pool.invoke(runParallel);
         //function call 3
         completeStep();
         return result;
