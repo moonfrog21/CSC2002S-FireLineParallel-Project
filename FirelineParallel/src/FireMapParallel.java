@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
  * grid update. This double-buffered design is important for both correctness
  * and later parallelisation.
  */
-public class FireMap {
+public class FireMapParallel {
 
     private static int minimumParallelArea = 10000;
 
@@ -146,13 +146,13 @@ public class FireMap {
     ForkJoinPool pool;
 
     //constructor 1
-    public FireMap(int rows, int columns, long seed, Mode mode) {
+    public FireMapParallel(int rows, int columns, long seed, Mode mode) {
         this(rows, columns, seed, mode, Landscape.MIXED,
                 null, null, null);
     }
 
     //calls constructor 2
-    public FireMap(int rows,
+    public FireMapParallel(int rows,
                    int columns,
                    long seed,
                    Mode mode,
@@ -197,14 +197,14 @@ public class FireMap {
 
     //this needs to be implemented in parallel
     private static class parallelUpdate extends RecursiveTask<StepResult> {
-        private final FireMap map;
+        private final FireMapParallel map;
         private final Mode mode;
         private final int rowStart;
         private final int rowEnd;
         private final int columnStart;
         private final int columnEnd;
 
-        parallelUpdate(FireMap map, Mode mode, int rowStart, int rowEnd, int columnStart, int columnEnd) {
+        parallelUpdate(FireMapParallel map, Mode mode, int rowStart, int rowEnd, int columnStart, int columnEnd) {
             this.map = map;
             this.mode = mode;
             this.rowStart = rowStart;
@@ -240,7 +240,7 @@ public class FireMap {
                 left.fork();
                 StepResult rightResult = right.compute();
                 StepResult leftResult = left.join();
-                return FireMap.StepResult.combine(leftResult,rightResult);
+                return FireMapParallel.StepResult.combine(leftResult,rightResult);
             }
   
         }

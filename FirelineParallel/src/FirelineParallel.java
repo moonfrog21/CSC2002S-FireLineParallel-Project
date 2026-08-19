@@ -34,7 +34,7 @@ public class FirelineParallel {
             int rows = parsePositiveInteger(args[0], "rows");
             int columns = parsePositiveInteger(args[1], "columns");
             long seed = Long.parseLong(args[2]);
-            FireMap.Mode mode = FireMap.Mode.fromString(args[3]);
+            FireMapParallel.Mode mode = FireMapParallel.Mode.fromString(args[3]);
             String outputPrefix = args[4].trim();
             int maximumSteps = args.length >= 6
                     ? parsePositiveInteger(args[5], "maximum steps")
@@ -42,9 +42,9 @@ public class FirelineParallel {
             double tolerance = args.length >= 7
                     ? parsePositiveDouble(args[6], "tolerance")
                     : DEFAULT_TOLERANCE;
-            FireMap.Landscape landscape = args.length >= 8
-                    ? FireMap.Landscape.fromString(args[7])
-                    : FireMap.Landscape.MIXED;
+            FireMapParallel.Landscape landscape = args.length >= 8
+                    ? FireMapParallel.Landscape.fromString(args[7])
+                    : FireMapParallel.Landscape.MIXED;
 
             Integer ignitionTopRow = null;
             Integer ignitionLeftColumn = null;
@@ -63,15 +63,15 @@ public class FirelineParallel {
                         "The output prefix may not be empty.");
             }
 
-            //creates a firemap object
+            //creates a FireMapParallel object
 
 
-            FireMap map = new FireMap(
+            FireMapParallel map = new FireMapParallel(
                     rows, columns, seed, mode, landscape,
                     ignitionTopRow, ignitionLeftColumn, ignitionPatchSize);
 
             long startTime = System.nanoTime();
-            FireMap.StepResult result = null; //step result variable?
+            FireMapParallel.StepResult result = null; //step result variable?
             int stepsCompleted = 0;
             boolean converged = false;
             
@@ -83,7 +83,7 @@ public class FirelineParallel {
                 stepsCompleted++;
 
                 //determine if fire has converged(completed), if so break.
-                if (mode == FireMap.Mode.WILDFIRE) {
+                if (mode == FireMapParallel.Mode.WILDFIRE) {
                     converged = result.getBurningCells() == 0 && result.getMaximumTemperatureChange() < tolerance;
                 } else {
                     converged = result.getMaximumTemperatureChange() < tolerance;

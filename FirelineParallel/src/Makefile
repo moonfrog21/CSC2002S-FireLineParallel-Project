@@ -1,7 +1,7 @@
 JAVAC = javac
 JAVA = java
 JFLAGS = --release 11 -d bin
-SOURCES = FirelineParallel.java FireMap.java TerrainType.java
+SOURCES = FirelineParallel.java FireMapParallel.java TerrainType.java
 ARGS ?= 300 300 42 wildfire output/fireline
 
 .PHONY: all run clean
